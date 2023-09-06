@@ -1,0 +1,67 @@
+? run_file(string full_path, list<string> args) {
+    string full_command = "mun " + full_path + " " + join(args, " ");
+    system(full_command);
+}
+run_file(resolve_path(get_ran_location(), "setup.mun"), []);
+
+string cache_file_path = resolve_path(get_ran_location(), "muncache");
+string base_directory = read_value(cache_file_path, "storage_path");
+string home_directory = read_value(cache_file_path, "home_path");
+
+set_location(home_directory);
+
+string commands_directory = read_value(cache_file_path, "commands_path");
+
+boolean running = true;
+
+list<string> commands = [];
+for(string file in get_files(commands_directory)) {
+    string command_name = split(file, ".")[-2];
+    commands += command_name;
+}
+
+add_autocomplete(commands);
+
+
+
+
+
+while(running) {
+    update_autocomplete();
+    list<string> location = split(get_location(), "/");
+    list<string> base_directory_l = split(base_directory, "/");
+    list<string> current_location = location - base_directory_l;
+    string command = strip(input("~/" + join(current_location, "/") + "$ "));
+    add_command_to_history(command);
+    list<string> command_parts = split(command, " ");
+    
+    string main_command = command_parts[0];
+
+    boolean found = false;
+
+
+    if(main_command == "exit") {
+        running = false;
+        found = true;
+    }
+
+    
+    if(length(main_command) > 1) {
+        for(string file in get_files(commands_directory)) {
+            string command_name = split(file, ".")[-2];
+            if(command_name == main_command) {
+                list<string> args = command_parts;
+                args-=[0];
+                run_file(commands_directory + "/" + file, args);
+                found = true;
+            } 
+        }
+    }   
+
+    if(found == false) {
+        print("Command '" + main_command + "' not found");
+    }
+
+    
+    
+}

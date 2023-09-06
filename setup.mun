@@ -1,0 +1,37 @@
+set_location(get_ran_location());
+
+string cache_file_path = resolve_path(get_location(), "muncache");
+
+
+
+
+if(!file_exists(cache_file_path)) {
+    create_file(cache_file_path);
+}
+
+if(read_file(cache_file_path) == "") {
+    write_file(cache_file_path, "{}");
+}
+
+
+string storage_dir_path = resolve_path(get_location(), "storage");
+string commands_dir_path = resolve_path(storage_dir_path, "commands");
+string home_dir_path = resolve_path(storage_dir_path, "home");
+
+if(!is_directory(storage_dir_path)) {
+    create_directory(storage_file_path);
+}
+
+if(!is_directory(commands_dir_path)) {
+    create_directory(commands_file_path);
+}
+
+if(!is_directory(home_dir_path)) {
+    create_directory(home_dir_path);
+}
+
+
+store_value(cache_file_path, "storage_path", storage_dir_path);
+store_value(cache_file_path, "commands_path", commands_dir_path);
+store_value(cache_file_path, "home_path", home_dir_path);
+
